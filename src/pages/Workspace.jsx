@@ -1,9 +1,6 @@
+import DataTable from "../ui/DataTable";
 function Workspace() {
-  return (
-    <div>
-      <h1>Workspace</h1>
-    </div>
-  );
+  return <DataTable />;
 }
 
 export default Workspace;

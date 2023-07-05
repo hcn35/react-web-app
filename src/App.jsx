@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Button, Result } from "antd";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
 import GlobalStyles from "./styles/GlobalStyles";
 import AppLayout from "./AppLayout";
 import Settings from "./pages/Settings";
@@ -16,9 +19,18 @@ import Classes from "./pages/Classes";
 import Quizzes from "./pages/Quizzes";
 import Resources from "./pages/Resources";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+    },
+  },
+});
+
 export default function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <GlobalStyles />
       <BrowserRouter>
         <Routes>
@@ -55,6 +67,6 @@ export default function App() {
           />
         </Routes>
       </BrowserRouter>
-    </>
+    </QueryClientProvider>
   );
 }

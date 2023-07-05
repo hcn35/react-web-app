@@ -1,69 +1,36 @@
-import { useEffect } from "react";
 import DataTable from "../ui/DataTable";
-import { Space } from "antd";
-import { getTransactions } from "../services/apiTransactions";
 
-const columns = [
-  {
-    title: "Date",
-    dataIndex: "date",
-    sorter: true,
-    width: "20%",
-  },
-  {
-    title: "Description",
-    dataIndex: "description",
-    width: "30%",
-  },
-  {
-    title: "Category",
-    dataIndex: "category",
-    width: "20%",
-  },
-  {
-    title: "Amount",
-    dataIndex: "amount",
-    width: "20%",
-  },
-  {
-    title: "",
-    dataIndex: "actions",
-    width: "10%",
-    render: () => (
-      <Space size="middle">
-        <a>Edit</a>
-      </Space>
-    ),
-  },
-];
-
-const data = [
-  {
-    key: "1",
-    date: "10/10/2021",
-    description: "Groceries",
-    category: "Food",
-    amount: "$100.00",
-  },
-  {
-    key: "2",
-    date: "10/10/2021",
-    description: "Groceries",
-    category: "Food",
-    amount: "$100.00",
-  },
-  {
-    key: "3",
-    date: "10/10/2021",
-    description: "Groceries",
-    category: "Food",
-    amount: "$100.00",
-  },
-];
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getTransactions,
+  deleteTransaction,
+} from "../services/apiTransactions";
 
 export default function Transactions() {
-  useEffect(() => {
-    getTransactions().then((data) => console.log(data));
-  }, []);
-  return <DataTable columns={columns} data={data} />;
+  const queryClient = useQueryClient();
+  const transactionsQuery = useQuery({
+    queryKey: ["transactions"],
+    queryFn: getTransactions,
+  });
+
+  const transactionsMutation = useMutation({
+    mutationFn: deleteTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+  });
+
+  if (transactionsQuery.error) {
+    return <div>Something went wrong...</div>;
+  }
+
+  return (
+    <>
+      <DataTable
+        data={transactionsQuery.data}
+        isLoading={transactionsQuery.isLoading}
+        mutate={transactionsMutation.mutate}
+      />
+    </>
+  );
 }
